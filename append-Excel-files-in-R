@@ -1,0 +1,26 @@
+# This is some basic code that transforms a set of spreadsheets and then collates them into one.
+
+# install.packages("readxl")
+# install.packages("dplyr")
+# may need to specify install.packages("x",type="binary")
+
+# library("readxl")
+# library("dplyr")
+
+# setwd(choose.dir())
+
+files<-list.files(pattern=".xls$",recursive=TRUE)
+files<-grep("^.*Copy",files,value=TRUE,invert=TRUE)
+files<-grep("^.*Monitor",files,value=TRUE,invert=TRUE)
+
+df0<-data.frame()
+
+for (i in files) {
+df1<-read_excel(i,range="A5:D21",col_names=FALSE)
+df1$Date<-pull(df1[1,2]) # pull is a dplyr function to change tibble to vector
+df1$Date<-as.Date(as.integer(df1$Date),origin="1899-12-30")
+colnames(df1)<-c("Region","PD","DCM","Total","Date")
+df0<-rbind(df0,df1[4:17,])
+}
+
+write.csv(df0,file="admissions.csv",row.names=FALSE)
