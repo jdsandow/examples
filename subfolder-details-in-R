@@ -1,0 +1,18 @@
+# This is R code that lists the sub-folders (and their last modification date) from a range of directories, aiming to make a reconciliation exercise easier
+
+setwd(choose.dir())
+
+folders<-read.csv("Sheet1.csv",header=FALSE,stringsAsFactors=FALSE) # This CSV contains a short list of master directories in the first column
+
+list.dirs(folders$V1,recursive=FALSE)
+results<-file.info(list.dirs(path=folders$V1,recursive=FALSE),isdir=TRUE)
+results<-cbind(Folder=rownames(results),results)
+rownames(results)<-1:nrow(results)
+results<-rapply(results,as.character,classes="factor",how="replace")
+
+install.packages("tidyr")
+library(tidyr)
+
+results<-separate(results,Folder,c('Dot','Type','FP','Year','Project'),sep='/',remove=FALSE)
+
+write.csv(results[c("Folder","Type","FP","Year","Project","mtime")],"projects.csv")
