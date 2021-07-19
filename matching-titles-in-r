@@ -1,0 +1,45 @@
+# MATCHING TITLES
+# This can be pasted line by line into R
+# A hashtag means that R will ignore anything to the right of the symbol on that line
+# 'production-tv.csv' has entries from our database, must include a column called Source Title
+# 'barb.csv' must include a column called Programme Title
+
+# list of words to remove, r goes through the list in order
+forremoval <- c("the ", ", the", "xyzxan ", "xyzxa ", "xyzx", "&", "#", "!", "\\.", ";", ":", "\\?", "-", "–", "series", "season", "£", 
+"iii", "ii", "\"", "'", "\\(", "\\)", "\\*", ",", " ", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", 
+"/", "and ", ", an", ", a", "drama") 
+
+setwd(choose.dir()) # choose the folder you have saved files in
+
+prodtv <- read.csv("production-tv.csv",stringsAsFactors=F)
+head(prodtv) # check to make sure it looks right
+prodtv$Amended <- prodtv$Source.Title # here $Source.Title is the name of the column you want to replace
+prodtv$Amended <- paste0("xyzx", prodtv$Amended) # this is a crude way of aiding the removal of 'a' and 'an' from the beginning of the title without removing it elsewhere
+prodtv$Amended <- sapply(prodtv$Amended, function(x) gsub(paste(forremoval,collapse="|"),'',x,ignore.case=T)) 
+head(prodtv) # check to make sure it looks right
+
+barb <- read.csv("barb.csv",stringsAsFactors=F)
+head(barb) # check to make sure it looks right
+barb$Amended <- tolower(barb$Programme.Title) # here $Programme.Title is the name of the column you want to replace
+barb$Amended <- paste0("bfix", barb$Amended) # this is a crude way of aiding the removal of 'a' and 'an' from the beginning of the title without removing it elsewhere
+barb$Amended <- sapply(barb$Amended, function(x) gsub(paste(forremoval,collapse="|"),'',x,ignore.case=T)) 
+head(barb) # check to make sure it looks right
+
+# This section 'fuzzy matches' the amended columns, doing this will take a while. Unless your computer is powerful, it's probably best to shut down
+# all other programs and make yourself a cup of tea whilst it runs this.
+# Documentation about the function: https://www.rdocumentation.org/packages/fuzzyjoin/versions/0.1.6/topics/stringdist_join
+# Documentation about the method used (here, LCS): https://www.rdocumentation.org/packages/stringdist/versions/0.9.6.3/topics/stringdist-metrics
+install.packages('fuzzyjoin') # you don't need this if you've already installed it before
+library('fuzzyjoin')
+matched <- stringdist_join(prodtv,barb,by='Amended',max_dist=2,method="lcs",mode="left",distance_col="Distance")
+head(matched) # check to make sure it looks right
+
+# If R says that there is not enough memory available - run this next line, then re-run line 34. Close down everything else before you do this!
+memory.limit(size=32000)
+
+# You can now export this as a CSV - it will save in your working directory. The output absolutely needs to be manually sense-checked, but it should
+# be a good starting point.
+write.csv(matched, "matched.csv", row.names=F)
+
+# write.csv(barb, "barb-amended.csv", row.names=F)
+# write.csv(prodtv, "cert-tv-amended.csv", row.names=F)
