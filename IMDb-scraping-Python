@@ -1,0 +1,39 @@
+# This scrapes the IMBb website for film ratings split by gender for al films with more than 10k votes
+# At the moment, it assumes that you have already downloaded the initial files from https://datasets.imdbws.com/
+
+import pandas as pd
+
+IMDBratings = pd.read_csv('title.ratings.tsv', delimiter="\t", low_memory=False)
+IMDBtitle = pd.read_csv('title.basics.tsv', delimiter="\t", usecols=[0,1,2,3,5,7,8], low_memory=False)
+
+IMDB = IMDBtitle.loc[IMDBtitle['titleType'] == "movie"].copy()
+IMDB = IMDB.merge(IMDBratings, on='tconst')
+IMDB = IMDB.loc[IMDB['numVotes'] >= 10000].copy().reset_index(drop=True)
+IMDB['Url'] = 'https://www.imdb.com/title/' + IMDB['tconst'] + '/ratings'
+
+IMDB.to_csv('IMDB.csv', index=False)
+
+import re
+import lxml
+
+from bs4 import BeautifulSoup
+from requests import get
+from operator import itemgetter
+
+Ratings = []
+Votes = []
+for i in IMDB['Url']:
+    url = i
+    page = get(url)
+    soup = BeautifulSoup(page.content, 'lxml') 
+    content = soup.find(id="main")
+    voteValues = content.select("div.smallcell > a")
+    voteValues = itemgetter(5,10)(voteValues)
+    Votes.append([n.text.strip() for n in voteValues])
+    ratingsValues = content.select("div.bigcell")
+    ratingsValues = itemgetter(5,10)(ratingsValues)
+    Ratings.append([n.text.strip() for n in ratingsValues])
+
+IMDB[['mVotes','fVotes']] = pd.DataFrame(Votes)
+IMDB[['mRating','fRating']] = pd.DataFrame(Ratings)
+IMDB.to_csv('IMDBgender.csv', index=False)
