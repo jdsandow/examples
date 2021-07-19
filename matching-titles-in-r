@@ -21,7 +21,7 @@ head(prodtv) # check to make sure it looks right
 barb <- read.csv("barb.csv",stringsAsFactors=F)
 head(barb) # check to make sure it looks right
 barb$Amended <- tolower(barb$Programme.Title) # here $Programme.Title is the name of the column you want to replace
-barb$Amended <- paste0("bfix", barb$Amended) # this is a crude way of aiding the removal of 'a' and 'an' from the beginning of the title without removing it elsewhere
+barb$Amended <- paste0("xyz", barb$Amended) # this is a crude way of aiding the removal of 'a' and 'an' from the beginning of the title without removing it elsewhere
 barb$Amended <- sapply(barb$Amended, function(x) gsub(paste(forremoval,collapse="|"),'',x,ignore.case=T)) 
 head(barb) # check to make sure it looks right
 
