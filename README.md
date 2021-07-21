@@ -1,5 +1,5 @@
 # Work Examples
-Examples of work in Python, R and Tableau
+Recent examples of work in Python, R and Tableau
 
 [Web scraping; Python](https://github.com/jdsandow/examples/blob/main/IMDb-scraping-Python)
 
