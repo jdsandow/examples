@@ -5,8 +5,6 @@ Recent examples of work in Python, R and Tableau
 
 [A map of Pact members; Tableau](https://public.tableau.com/app/profile/jd8131/viz/Pact/Sheet1)
 
-[Appending Excel spreadsheets; R](https://github.com/jdsandow/examples/blob/main/append-Excel-files-in-R)
-
 [Listing folder details; R](https://github.com/jdsandow/examples/blob/main/subfolder-details-in-R)
 
 [Fuzzy matching and merging data tables; R](https://github.com/jdsandow/examples/blob/main/matching-titles-in-r)  
