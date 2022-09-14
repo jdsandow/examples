@@ -1,5 +1,6 @@
 # This scrapes the IMDb website for film ratings split by gender for all films with more than 10k votes
 # At the moment, it assumes that you have already downloaded the initial files from https://datasets.imdbws.com/
+# Work in progress!
 
 import pandas as pd
 
